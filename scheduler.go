@@ -371,7 +371,7 @@ func remainingDaysToWeekday(from time.Weekday, weekDays []time.Weekday) int {
 	for _, day := range weekDays {
 		differenceBetweenDays := int(day) - int(from)
 		// checking only if is smaller than max cause there is no way to be equals
-		if differenceBetweenDays > 0 && differenceBetweenDays < daysUntilScheduledDayPositive {
+		if differenceBetweenDays >= 0 && differenceBetweenDays < daysUntilScheduledDayPositive {
 			daysUntilScheduledDayPositive = differenceBetweenDays
 		}
 
@@ -476,8 +476,8 @@ func (s *Scheduler) run(job *Job) {
 		return
 	}
 
-	job.Lock()
-	defer job.Unlock()
+	job.mu.Lock()
+	defer job.mu.Unlock()
 	job.setLastRun(s.now())
 	job.runCount++
 	s.executor.jobFunctions <- job.jobFunction
@@ -536,8 +536,8 @@ func (s *Scheduler) Remove(job interface{}) {
 func (s *Scheduler) RemoveByReference(job *Job) {
 	s.removeJobsUniqueTags(job)
 	s.removeByCondition(func(someJob *Job) bool {
-		job.RLock()
-		defer job.RUnlock()
+		job.mu.RLock()
+		defer job.mu.RUnlock()
 		return someJob == job
 	})
 }

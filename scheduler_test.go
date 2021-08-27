@@ -1583,7 +1583,7 @@ func TestScheduler_CheckNextWeekDay(t *testing.T) {
 	const (
 		wantTimeUntilNextFirstRun = 1 * time.Second
 		// all day long
-		wantTimeUntilNextSecondRun = 24 * time.Hour
+		wantTimeUntilNextSecondRun = time.Duration(0)
 	)
 
 	t.Run("check slice next run", func(t *testing.T) {
@@ -1591,7 +1591,7 @@ func TestScheduler_CheckNextWeekDay(t *testing.T) {
 		lastRun := januaryFirst2020At(23, 59, 59)
 		secondLastRun := januarySecond2020At(0, 0, 0)
 
-		job, err := s.Every(1).Week().Friday().Thursday().Do(func() {})
+		job, err := s.Every(1).Week().Thursday().Friday().Do(func() {})
 		require.NoError(t, err)
 		job.lastRun = lastRun
 
